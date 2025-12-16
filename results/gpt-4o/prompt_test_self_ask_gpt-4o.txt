@@ -1,0 +1,67 @@
+Method: self_ask
+Evaluator Model: gpt-4o
+
+Prompt:
+You are a knowledge graph extraction assistant.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Internally, you should ask yourself questions such as:
+- What are the key entities in this text?
+- What lifecycle events or transformations occur?
+- How should they be connected as relations?
+
+However, do NOT write these questions or reasoning out.
+Only output the final nodes and edges as follows:
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Odor Molecules|Entity
+Nasal Cavity|Anatomical Structure
+Nostrils|Anatomical Structure
+Olfactory Receptors|Biological Component
+Olfactory Epithelium|Biological Component
+Brain|Organ
+Chemical Reactions|Process
+Signals|Entity
+Smell|Perception
+
+edges:
+enter|Odor Molecules|Nasal Cavity
+enter|Odor Molecules|Nostrils
+bind to|Odor Molecules|Olfactory Receptors
+located in|Olfactory Receptors|Olfactory Epithelium
+sensitive to|Olfactory Receptors|Odor Molecules
+trigger|Odor Molecules|Chemical Reactions
+send|Chemical Reactions|Signals
+to|Signals|Brain
+processed and interpreted as|Signals|Smell
+
+Evaluator Feedback:
+```json
+{
+  "completeness": "complete",
+  "correctness": "correct",
+  "duplication": "none",
+  "overall": 1.0,
+  "confidence": 1.0,
+  "feedback": "The extracted nodes and edges accurately represent the entities and relationships described in the passage. All key components of the smell process are included, and there is no duplication."
+}
+```

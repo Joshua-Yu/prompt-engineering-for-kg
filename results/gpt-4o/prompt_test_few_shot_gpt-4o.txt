@@ -1,0 +1,103 @@
+Method: few_shot
+Evaluator Model: gpt-4o
+
+Prompt:
+You are an expert system for extracting entities and relations as nodes and edges for a knowledge graph.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Here are some examples of the expected format:
+
+Example 1 text:
+"Leaves absorb sunlight."
+
+Example 1 output:
+nodes:
+Leaves|plant_part
+Sunlight|energy
+
+edges:
+absorb|Leaves|Sunlight
+
+
+Example 2 text:
+"A caterpillar turns into a butterfly."
+
+Example 2 output:
+nodes:
+Caterpillar|organism
+Butterfly|organism
+
+edges:
+transforms_into|Caterpillar|Butterfly
+
+
+Example 3 text:
+"Birds lay eggs in nests."
+
+Example 3 output:
+nodes:
+Birds|organism
+Eggs|object
+Nests|location
+
+edges:
+lay|Birds|Eggs
+located_in|Eggs|Nests
+
+
+Now process the following text.
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Odor molecules|chemical
+Nasal cavity|body_part
+Nostrils|body_part
+Olfactory receptors|biological_structure
+Olfactory epithelium|tissue
+Receptor|biological_structure
+Chemical reactions|process
+Signals|information
+Brain|organ
+Smell|sense
+
+edges:
+enter|Odor molecules|Nasal cavity
+through|Nasal cavity|Nostrils
+bind_to|Odor molecules|Olfactory receptors
+located_in|Olfactory receptors|Olfactory epithelium
+sensitive_to|Receptor|Odor molecules
+trigger|Odor molecules|Chemical reactions
+send|Chemical reactions|Signals
+to|Signals|Brain
+processed_as|Signals|Smell
+interpreted_as|Signals|Smell
+
+Evaluator Feedback:
+```json
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 10%",
+  "overall": 0.7,
+  "confidence": 0.8,
+  "feedback": "The extraction captures most key entities and relations, but there are some issues. 'Receptor' and 'Olfactory receptors' are treated as separate nodes, which is a duplication. The edge 'through|Nasal cavity|Nostrils' is incorrect as the passage states odor molecules enter the nasal cavity through the nostrils, not the other way around. The edge 'processed_as|Signals|Smell' is not directly supported by the passage, which states signals are processed and interpreted in the brain. Overall, the extraction is mostly correct but has minor errors and duplications."
+}
+```

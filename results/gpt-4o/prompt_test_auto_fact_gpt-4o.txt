@@ -1,0 +1,130 @@
+Method: auto_fact
+Evaluator Model: gpt-4o
+
+Prompt:
+
+You are an expert extractor that converts natural-language text into atomic semantic facts.
+Your goal is to extract MEANING, not surface wording.
+
+Each fact must follow the rules of:
+- canonicalization
+- event detection
+- verb normalization
+- modifier / qualifier extraction
+- negation handling
+- semantic role assignment
+
+##CANONICALIZATION RULES
+
+1. SUBJECTS & OBJECTS (Concepts)
+- Convert to lower case and singular form.
+- Reduce to the minimal meaningful noun phrase.
+- Resolve pronouns to their referents.
+- Remove non-semantic determiners (“the”, “a”, “its”, “their”, “his”, “her”, “own”).
+- Preserve meaningful descriptors (e.g., “gravitational pull” rather than “gravitational” and “pull”).
+- Normalize equivalent phrasings that express the same concept:
+  - Possessive form (“X’s Y”)
+  - Prepositional form (“Y of X”)
+
+For example:
+
+“butterfly’s lifecycle”  
+“lifecycle of butterflies”  
+→ canonical concept: “butterfly lifecycle”
+
+You must generalize this pattern to all similar constructions.
+
+
+2. PREDICATES
+- Use only verbs (or nominalizations) from the input text.
+- Canonicalize verbs to base form, third-person present tense.
+- Convert nominalizations to verbs
+  (“discovery of X” → predicate “discover”).
+
+3. EVENT DETECTION
+- If the predicate describes an action, process, or change → `predicate_is_event` = true.
+- Linking verbs (“is/are/was/were”) → treated as events ONLY if expressing identity or definition.
+- Otherwise, linking verbs generate non-event relational facts.
+
+4. MODIFIERS & QUALIFIERS
+- MODIFIERS: descriptive meaning (adjectives/adverbs).
+- QUALIFIERS: degree, extent, hedging.
+- Attach them to subject, predicate, or object as appropriate.
+
+5. NEGATION
+- Detect “not”, “never”, “no longer”, “doesn’t”, etc.
+- Set polarity = “negative”.
+- Do NOT output a concept for negation words.
+
+6. TIME & LOCATION
+- Extract explicit time or location expressions.
+- Canonicalize them to simple lower-case noun phrases.
+
+7. FACT INDEX
+- Within each sentence, assign a 0-based index to each fact:
+  - The first fact in a sentence has "fact_index": 0
+  - The second fact in the same sentence has "fact_index": 1
+  - And so on.
+- This index is local to the sentence (it resets for each sentence).
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+##INPUT_TEXT:
+<<<
+How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell.
+>>>
+
+
+LLM Output:
+nodes:
+odor molecule|concept
+nasal cavity|concept
+nostril|concept
+olfactory receptor|concept
+olfactory epithelium|concept
+tissue|concept
+layer|concept
+receptor|concept
+specific odor molecule|concept
+chemical reaction|concept
+signal|concept
+brain|concept
+smell|concept
+
+edges:
+enter|odor molecule|nasal cavity
+through|odor molecule|nostril
+bind|odor molecule|olfactory receptor
+locate|olfactory receptor|olfactory epithelium
+be|olfactory epithelium|layer
+be|olfactory epithelium|tissue
+be sensitive to|receptor|specific odor molecule
+allow|receptor|distinguish
+between|distinguish|smell
+trigger|odor molecule|chemical reaction
+send|chemical reaction|signal
+to|signal|brain
+process|brain|signal
+interpret|brain|smell
+
+Evaluator Feedback:
+```json
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 10%",
+  "overall": 0.7,
+  "confidence": 0.8,
+  "feedback": "The extraction captures many key entities and relations, but misses some important details such as the role of the olfactory epithelium in housing receptors. There are also some incorrect or unclear edges, such as 'allow|receptor|distinguish' which lacks clarity. Duplication is minimal, but 'receptor' and 'olfactory receptor' could be considered redundant."
+}
+```

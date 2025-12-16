@@ -1,0 +1,60 @@
+Method: rag
+Evaluator Model: gpt-4o
+
+Prompt:
+Extract knowledge triples from the text. Here are a few examples:
+Text: Birds lay eggs in nests. Triples: (Birds, lay, Eggs); (Eggs, located_in, Nests) 
+Examples end here. Apply the same reasoning to the input and output only the nodes and edges using this format:
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Odor Molecules|Entity
+Nasal Cavity|Location
+Nostrils|Location
+Olfactory Receptors|Entity
+Olfactory Epithelium|Location
+Receptor|Entity
+Brain|Entity
+Smell|Entity
+Chemical Reactions|Process
+Signals|Entity
+
+edges:
+enter|Odor Molecules|Nasal Cavity
+enter|Odor Molecules|Nostrils
+bind_to|Odor Molecules|Olfactory Receptors
+located_in|Olfactory Receptors|Olfactory Epithelium
+sensitive_to|Receptor|Odor Molecules
+trigger|Odor Molecules|Chemical Reactions
+send|Chemical Reactions|Signals
+processed_in|Signals|Brain
+interpreted_as|Signals|Smell
+
+Evaluator Feedback:
+```json
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 10%",
+  "overall": 0.7,
+  "confidence": 0.9,
+  "feedback": "The extraction captures most key entities and relationships, but misses the specificity of 'each receptor' being sensitive to specific odor molecules. The edge 'sensitive_to' should connect 'Olfactory Receptors' to 'Odor Molecules' instead of 'Receptor'. There is a minor duplication with 'enter' edges for 'Nasal Cavity' and 'Nostrils'."
+}
+```
