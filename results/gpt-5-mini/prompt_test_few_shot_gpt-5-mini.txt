@@ -1,0 +1,107 @@
+Method: few_shot
+Evaluator Model: gpt-5-mini
+
+Prompt:
+You are an expert system for extracting entities and relations as nodes and edges for a knowledge graph.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Here are some examples of the expected format:
+
+Example 1 text:
+"Leaves absorb sunlight."
+
+Example 1 output:
+nodes:
+Leaves|plant_part
+Sunlight|energy
+
+edges:
+absorb|Leaves|Sunlight
+
+
+Example 2 text:
+"A caterpillar turns into a butterfly."
+
+Example 2 output:
+nodes:
+Caterpillar|organism
+Butterfly|organism
+
+edges:
+transforms_into|Caterpillar|Butterfly
+
+
+Example 3 text:
+"Birds lay eggs in nests."
+
+Example 3 output:
+nodes:
+Birds|organism
+Eggs|object
+Nests|location
+
+edges:
+lay|Birds|Eggs
+located_in|Eggs|Nests
+
+
+Now process the following text.
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Smell|sensation
+Odor molecules|molecule
+Specific odor molecules|molecule
+Nostrils|structure
+Nasal cavity|location
+Back of the nasal cavity|location
+Olfactory epithelium|tissue
+Olfactory receptors|receptor
+Chemical reactions|process
+Signals|signal
+Brain|organ
+Particular smell|perception
+Smell discrimination|ability
+
+edges:
+begins_with|Smell|Odor molecules
+enter_through|Odor molecules|Nostrils
+enter|Odor molecules|Nasal cavity
+located_in|Olfactory receptors|Olfactory epithelium
+located_in|Olfactory epithelium|Back of the nasal cavity
+part_of|Back of the nasal cavity|Nasal cavity
+binds_to|Odor molecules|Olfactory receptors
+sensitive_to|Olfactory receptors|Specific odor molecules
+binding_triggers|Odor molecules|Chemical reactions
+send_signals_to|Chemical reactions|Brain
+processed_in|Signals|Brain
+interpreted_as|Brain|Particular smell
+enables|Olfactory receptors|Smell discrimination
+
+Evaluator Feedback:
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 30%",
+  "overall": 0.68,
+  "confidence": 0.82,
+  "feedback": "Major entities are present, but some relations are imprecise or inconsistent. Errors: chemical reactions -> Brain (should be reactions produce Signals, Signals -> Brain), binding should be receptor-binding triggers reactions (not Odor molecules directly to reactions). Minor redundancies: 'Odor molecules' vs 'Specific odor molecules', both 'enter_through' and 'enter' edges. Add explicit edge Chemical reactions -> Signals and Signals -> Brain, and clarify binding occurs at receptors to improve correctness."
+}

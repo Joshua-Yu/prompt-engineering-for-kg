@@ -1,0 +1,78 @@
+Method: zero_shot
+Evaluator Model: gpt-5-mini
+
+Prompt:
+You are a knowledge graph extraction assistant.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Smell|Sensation
+Odor molecules|Molecule
+Nasal cavity|Anatomical structure
+Nostrils|Anatomical structure
+Entry of odor molecules into the nasal cavity through the nostrils|Event
+Olfactory receptors|Receptor
+Olfactory epithelium|Tissue
+Thin layer of tissue|Description
+Back of the nasal cavity|Location
+Binding of odor molecules to olfactory receptors|Event
+Chemical reactions|Biological process
+Signals|Neural signal
+Brain|Organ
+Particular smell|Sensation
+Specific odor molecules|Molecule
+Distinguish different smells|Function
+
+edges:
+enters_into|Odor molecules|Nasal cavity
+enters_through|Odor molecules|Nostrils
+entry_event_involves|Entry of odor molecules into the nasal cavity through the nostrils|Odor molecules
+entry_event_involves|Entry of odor molecules into the nasal cavity through the nostrils|Nostrils
+entry_event_involves|Entry of odor molecules into the nasal cavity through the nostrils|Nasal cavity
+begins_when|Smell|Entry of odor molecules into the nasal cavity through the nostrils
+located_in|Olfactory receptors|Olfactory epithelium
+is_a|Olfactory epithelium|Thin layer of tissue
+located_at|Olfactory epithelium|Back of the nasal cavity
+part_of|Back of the nasal cavity|Nasal cavity
+binds_to|Odor molecules|Olfactory receptors
+binding_event_involves|Binding of odor molecules to olfactory receptors|Odor molecules
+binding_event_involves|Binding of odor molecules to olfactory receptors|Olfactory receptors
+occurs_in|Binding of odor molecules to olfactory receptors|Olfactory epithelium
+sensitive_to|Olfactory receptors|Specific odor molecules
+enables|Olfactory receptors|Distinguish different smells
+subset_of|Specific odor molecules|Odor molecules
+corresponds_to|Specific odor molecules|Particular smell
+binding_triggers|Binding of odor molecules to olfactory receptors|Chemical reactions
+chemical_reactions_send|Chemical reactions|Signals
+processed_in|Signals|Brain
+processed_into|Signals|Particular smell
+interprets_as|Brain|Particular smell
+
+Evaluator Feedback:
+{
+  "completeness": "complete",
+  "correctness": "correct",
+  "duplication": "less than 30%",
+  "overall": 0.88,
+  "confidence": 0.80,
+  "feedback": "Extraction is faithful and includes the key entities/relations (odor entry, receptors in epithelium, binding → chemical reactions → signals → brain → smell). Minor redundancies: 'Smell' and 'Particular smell' overlap, 'Odor molecules' vs 'Specific odor molecules' overlap, and 'Thin layer of tissue' duplicates the type of olfactory epithelium. Some edges are slightly redundant but not incorrect."
+}

@@ -1,0 +1,87 @@
+Method: cot
+Evaluator Model: gpt-5-mini
+
+Prompt:
+You are an expert in knowledge graph extraction.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Think through the following steps internally (do NOT write them out):
+1. Identify all important entities in the text.
+2. Group them into unique nodes (name + label).
+3. Identify all meaningful relations between the nodes.
+4. Map them into edges using exact node names.
+
+Only output the final result in this format, with no explanation:
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Smell|Process
+Odor molecules|Molecule
+Odor molecules entering the nasal cavity|Event
+Nasal cavity|Anatomical structure
+Nostrils|Anatomical structure
+Olfactory receptors|Receptor
+Olfactory epithelium|Tissue
+Thin layer of tissue|Property
+Back of the nasal cavity|Location
+Specific odor molecules|Molecule subset
+Binding of odor molecules to receptors|Event
+Chemical reactions|Biochemical process
+Signals|Signal
+Brain|Organ
+Processing in the brain|Cognitive process
+Particular smell|Percept
+Distinguish between different smells|Ability
+
+edges:
+begins_with|Smell|Odor molecules entering the nasal cavity
+enter_through|Odor molecules|Nostrils
+enter_into|Odor molecules|Nasal cavity
+involves|Odor molecules entering the nasal cavity|Odor molecules
+occurs_in|Odor molecules entering the nasal cavity|Nasal cavity
+binds_to|Odor molecules|Olfactory receptors
+binding_event_involves|Binding of odor molecules to receptors|Odor molecules
+binding_event_involves|Binding of odor molecules to receptors|Olfactory receptors
+triggers|Binding of odor molecules to receptors|Chemical reactions
+located_in|Olfactory receptors|Olfactory epithelium
+is_a|Olfactory epithelium|Thin layer of tissue
+located_at|Olfactory epithelium|Back of the nasal cavity
+located_in|Olfactory epithelium|Nasal cavity
+is_sensitive_to|Olfactory receptors|Specific odor molecules
+subset_of|Specific odor molecules|Odor molecules
+allows|Olfactory receptors|Distinguish between different smells
+produces|Chemical reactions|Signals
+send_signals_to|Signals|Brain
+processed_in|Signals|Brain
+interpreted_as|Signals|Particular smell
+is_performed_in|Processing in the brain|Brain
+interprets|Processing in the brain|Signals
+interpretation_results_in|Processing in the brain|Particular smell
+
+Evaluator Feedback:
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 30%",
+  "overall": 0.78,
+  "confidence": 0.80,
+  "feedback": "Most key entities and relations are extracted (odor molecules, nostrils, nasal cavity, olfactory receptors, epithelium, binding → chemical reactions → signals → brain → perception). Missing finer details (receptors are specialized, 'series' of chemical reactions as a chain, explicit linkage that processing interprets signals rather than signals alone), and there is some redundancy (both a binding event node and a direct binds_to edge; signals→brain expressed multiple ways). Small correctness issues are present but overall faithful."
+}

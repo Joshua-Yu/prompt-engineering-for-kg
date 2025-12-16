@@ -1,0 +1,170 @@
+Method: auto_fact
+Evaluator Model: gpt-5-mini
+
+Prompt:
+
+You are an expert extractor that converts natural-language text into atomic semantic facts.
+Your goal is to extract MEANING, not surface wording.
+
+Each fact must follow the rules of:
+- canonicalization
+- event detection
+- verb normalization
+- modifier / qualifier extraction
+- negation handling
+- semantic role assignment
+
+##CANONICALIZATION RULES
+
+1. SUBJECTS & OBJECTS (Concepts)
+- Convert to lower case and singular form.
+- Reduce to the minimal meaningful noun phrase.
+- Resolve pronouns to their referents.
+- Remove non-semantic determiners (“the”, “a”, “its”, “their”, “his”, “her”, “own”).
+- Preserve meaningful descriptors (e.g., “gravitational pull” rather than “gravitational” and “pull”).
+- Normalize equivalent phrasings that express the same concept:
+  - Possessive form (“X’s Y”)
+  - Prepositional form (“Y of X”)
+
+For example:
+
+“butterfly’s lifecycle”  
+“lifecycle of butterflies”  
+→ canonical concept: “butterfly lifecycle”
+
+You must generalize this pattern to all similar constructions.
+
+
+2. PREDICATES
+- Use only verbs (or nominalizations) from the input text.
+- Canonicalize verbs to base form, third-person present tense.
+- Convert nominalizations to verbs
+  (“discovery of X” → predicate “discover”).
+
+3. EVENT DETECTION
+- If the predicate describes an action, process, or change → `predicate_is_event` = true.
+- Linking verbs (“is/are/was/were”) → treated as events ONLY if expressing identity or definition.
+- Otherwise, linking verbs generate non-event relational facts.
+
+4. MODIFIERS & QUALIFIERS
+- MODIFIERS: descriptive meaning (adjectives/adverbs).
+- QUALIFIERS: degree, extent, hedging.
+- Attach them to subject, predicate, or object as appropriate.
+
+5. NEGATION
+- Detect “not”, “never”, “no longer”, “doesn’t”, etc.
+- Set polarity = “negative”.
+- Do NOT output a concept for negation words.
+
+6. TIME & LOCATION
+- Extract explicit time or location expressions.
+- Canonicalize them to simple lower-case noun phrases.
+
+7. FACT INDEX
+- Within each sentence, assign a 0-based index to each fact:
+  - The first fact in a sentence has "fact_index": 0
+  - The second fact in the same sentence has "fact_index": 1
+  - And so on.
+- This index is local to the sentence (it resets for each sentence).
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+##INPUT_TEXT:
+<<<
+How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell.
+>>>
+
+
+LLM Output:
+nodes:
+smell|concept
+odor molecule|concept
+nasal cavity|location
+nostril|location
+olfactory receptor|concept
+olfactory epithelium|concept
+layer of tissue|concept
+back of nasal cavity|location
+olfactory receptor sensitivity|concept
+human|concept
+chemical reaction series|concept
+signal|concept
+brain|concept
+specialized|modifier
+specific|modifier
+thin|modifier
+different|modifier
+particular|modifier
+enter (sentence 1 fact_index 0)|predicate; sentence:1; fact_index:0; event:true; polarity:positive
+begin (sentence 1 fact_index 1)|predicate; sentence:1; fact_index:1; event:true; polarity:positive
+binds (sentence 2 fact_index 0)|predicate; sentence:2; fact_index:0; event:true; polarity:positive
+located (sentence 2 fact_index 1)|predicate; sentence:2; fact_index:1; event:false; polarity:positive
+be (sentence 2 fact_index 2)|predicate; sentence:2; fact_index:2; event:true; polarity:positive
+located (sentence 2 fact_index 3)|predicate; sentence:2; fact_index:3; event:false; polarity:positive
+is sensitive (sentence 3 fact_index 0)|predicate; sentence:3; fact_index:0; event:false; polarity:positive
+allows (sentence 3 fact_index 1)|predicate; sentence:3; fact_index:1; event:true; polarity:positive
+distinguish (sentence 3 fact_index 1)|predicate; sentence:3; fact_index:1; event:true; polarity:positive
+binds (sentence 4 fact_index 0)|predicate; sentence:4; fact_index:0; event:true; polarity:positive
+triggers (sentence 4 fact_index 1)|predicate; sentence:4; fact_index:1; event:true; polarity:positive
+sends (sentence 4 fact_index 2)|predicate; sentence:4; fact_index:2; event:true; polarity:positive
+processes (sentence 4 fact_index 3)|predicate; sentence:4; fact_index:3; event:true; polarity:positive
+interprets (sentence 4 fact_index 4)|predicate; sentence:4; fact_index:4; event:true; polarity:positive
+
+edges:
+subject|enter (sentence 1 fact_index 0)|odor molecule
+object|enter (sentence 1 fact_index 0)|nasal cavity
+via|enter (sentence 1 fact_index 0)|nostril
+subject|begin (sentence 1 fact_index 1)|smell
+temporal|begin (sentence 1 fact_index 1)|enter (sentence 1 fact_index 0)
+subject|binds (sentence 2 fact_index 0)|odor molecule
+object|binds (sentence 2 fact_index 0)|olfactory receptor
+modifier|olfactory receptor|specialized
+subject|located (sentence 2 fact_index 1)|olfactory receptor
+object|located (sentence 2 fact_index 1)|olfactory epithelium
+subject|be (sentence 2 fact_index 2)|olfactory epithelium
+object|be (sentence 2 fact_index 2)|layer of tissue
+modifier|layer of tissue|thin
+subject|located (sentence 2 fact_index 3)|olfactory epithelium
+object|located (sentence 2 fact_index 3)|back of nasal cavity
+subject|is sensitive (sentence 3 fact_index 0)|olfactory receptor
+object|is sensitive (sentence 3 fact_index 0)|odor molecule
+modifier|odor molecule|specific
+subject|allows (sentence 3 fact_index 1)|olfactory receptor sensitivity
+beneficiary|allows (sentence 3 fact_index 1)|human
+purpose|allows (sentence 3 fact_index 1)|distinguish (sentence 3 fact_index 1)
+subject|distinguish (sentence 3 fact_index 1)|human
+object|distinguish (sentence 3 fact_index 1)|smell
+modifier|smell|different
+subject|binds (sentence 4 fact_index 0)|odor molecule
+object|binds (sentence 4 fact_index 0)|olfactory receptor
+subject|triggers (sentence 4 fact_index 1)|binds (sentence 4 fact_index 0)
+object|triggers (sentence 4 fact_index 1)|chemical reaction series
+subject|sends (sentence 4 fact_index 2)|chemical reaction series
+object|sends (sentence 4 fact_index 2)|signal
+location|sends (sentence 4 fact_index 2)|brain
+subject|processes (sentence 4 fact_index 3)|signal
+location|processes (sentence 4 fact_index 3)|brain
+subject|interprets (sentence 4 fact_index 4)|signal
+object|interprets (sentence 4 fact_index 4)|smell
+modifier|smell|particular
+location|interprets (sentence 4 fact_index 4)|brain
+
+Evaluator Feedback:
+{
+  "completeness": "complete",
+  "correctness": "mixed",
+  "duplication": "less than 10%",
+  "overall": 0.85,
+  "confidence": 0.80,
+  "feedback": "Most key entities and relations are captured (odor molecules → enter nostrils → nasal cavity; bind → olfactory receptors in olfactory epithelium; binding → chemical reactions → signals → brain → processing/interpretation). Minor issues: modeling choices are inconsistent (e.g., 'olfactory receptor sensitivity' as a separate subject, predicates labelled with sentence metadata), repeated 'binds' edges from two sentences (not harmful), and small lexical mismatches ('nostril' singular vs 'nostrils'). These are minor and do not break the core extraction."
+}

@@ -1,0 +1,85 @@
+Method: one_shot
+Evaluator Model: gpt-5-mini
+
+Prompt:
+You are an expert knowledge graph extractor.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Follow the format and style of this example:
+
+Example text:
+"Water evaporates from the ocean surface."
+
+Example output:
+nodes:
+Water|substance
+Ocean surface|location
+
+edges:
+evaporates_from|Water|Ocean surface
+
+Now process the following text.
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Smell|phenomenon
+Odor molecules|molecule
+Specific odor molecules|molecule_subset
+Nasal cavity|location
+Nostrils|anatomical_feature
+Olfactory receptors|receptor
+Olfactory epithelium|tissue
+Thin layer of tissue|anatomical_description
+Back of the nasal cavity|location
+Binding of odor molecules to olfactory receptors|event
+Chemical reactions|process
+Signals|signal
+Brain|organ
+Particular smell|percept
+Different smells|concept
+
+edges:
+enter_through|Odor molecules|Nostrils
+enter_into|Odor molecules|Nasal cavity
+bind_to|Odor molecules|Olfactory receptors
+involves|Binding of odor molecules to olfactory receptors|Odor molecules
+involves|Binding of odor molecules to olfactory receptors|Olfactory receptors
+located_in|Olfactory receptors|Olfactory epithelium
+is_a|Olfactory epithelium|Thin layer of tissue
+located_at_back_of|Olfactory epithelium|Back of the nasal cavity
+sensitive_to|Olfactory receptors|Specific odor molecules
+allows_distinguish|Olfactory receptors|Different smells
+binding_triggers|Binding of odor molecules to olfactory receptors|Chemical reactions
+produces|Chemical reactions|Signals
+sent_to|Signals|Brain
+processes_and_interprets|Brain|Signals
+interpreted_as|Signals|Particular smell
+perceived_as|Particular smell|Smell
+
+Evaluator Feedback:
+{
+  "completeness": "complete",
+  "correctness": "correct",
+  "duplication": "less than 10%",
+  "overall": 0.92,
+  "confidence": 0.85,
+  "feedback": "Extraction captures the main entities and relations (odor entry, binding, receptors in epithelium, chemical reactions → signals → brain → perceived smell). Minor issues: 'specialized' receptor attribute not encoded, 'brain interprets signals as smell' could be expressed explicitly linking Brain→Particular smell, and the 'thin layer of tissue' node is somewhat redundant with olfactory epithelium."
+}

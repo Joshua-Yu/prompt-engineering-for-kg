@@ -1,0 +1,64 @@
+Method: rag
+Evaluator Model: gpt-5-mini
+
+Prompt:
+Extract knowledge triples from the text. Here are a few examples:
+Text: Birds lay eggs in nests. Triples: (Birds, lay, Eggs); (Eggs, located_in, Nests) 
+Examples end here. Apply the same reasoning to the input and output only the nodes and edges using this format:
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Smell|Perception
+odor molecules|Molecule
+nasal cavity|Anatomical structure
+nostrils|Anatomical structure
+olfactory receptors|Receptor
+olfactory epithelium|Tissue
+back of the nasal cavity|Location
+different smells|Perception
+chemical reactions|Process
+signals|Signal
+brain|Organ
+particular smell|Perception
+
+edges:
+enters|odor molecules|nasal cavity
+enter_through|odor molecules|nostrils
+begins_when|Smell|odor molecules
+bind_to|odor molecules|olfactory receptors
+located_in|olfactory receptors|olfactory epithelium
+located_in|olfactory epithelium|back of the nasal cavity
+sensitive_to|olfactory receptors|odor molecules
+allow_distinguish|olfactory receptors|different smells
+triggers|odor molecules|chemical reactions
+produce|chemical reactions|signals
+send_signals_to|signals|brain
+processed_in|signals|brain
+interpreted_as|brain|particular smell
+
+Evaluator Feedback:
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 30%",
+  "overall": 0.72,
+  "confidence": 0.80,
+  "feedback": "Most key entities (odor molecules, receptors, epithelium, nasal cavity, brain, chemical reactions, signals) are present and many relations are captured. Missing/weak items: the binding event linking receptor binding to triggering reactions (relation should involve the receptor-binding event), the descriptor 'thin layer' for the epithelium (minor detail), and that receptors (not only molecules) initiate the signalling. Some relations are slightly off (e.g. 'interpreted_as|brain|particular smell' would more precisely be 'signals processed/interpreted by brain -> particular smell'). There is moderate duplication of concept nodes for smell (Smell, different smells, particular smell). Overall extraction is usable but has a few semantic inaccuracies and omissions."
+}

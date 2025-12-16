@@ -1,0 +1,59 @@
+Method: react
+Evaluator Model: gpt-5-mini
+
+Prompt:
+Your task is extracting knowledge triples from text. A knowledge triple consists of three elements: subject - predicate - object. Subjects and objects are entities and the predicate is the relation between them. Let's use an example:
+Text: Leaves absorb sunlight. Thought 1: I need to determine the entities. Act 1: Named entity extraction. Observation 1: Leaves; Sunlight Thought 2: What type of entities do I have? Act 2: Named entity tagging Observation 2: Leaves: plant_part; Sunlight: energy Thought 3: What are the potential relations between these entities? Act3: List the potential relations Observation3: Leaves absorb Sunlight Thought 4: What are the triples? Act4: Form the triples Observation4: (Leaves, absorb, Sunlight) Thought5: I have extracted knowledge triples from the input text. Act5: Finish Observation5: Task is completed. 
+Before answering a query, think and decide your act as shown above. Extract the knowledge triples from the following text, but only output the final nodes and edges in this format:
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Odor molecules|molecule
+Nostrils|anatomical_site
+Nasal cavity|anatomical_structure
+Olfactory epithelium|tissue
+Olfactory receptors|receptor
+Chemical reactions|process
+Signals|signal
+Brain|organ
+Particular smell|perception
+
+edges:
+enter_through|Odor molecules|Nostrils
+enter_into|Odor molecules|Nasal cavity
+located_in|Olfactory epithelium|Nasal cavity
+located_in|Olfactory receptors|Olfactory epithelium
+sensitive_to|Olfactory receptors|Odor molecules
+binds_to|Odor molecules|Olfactory receptors
+triggers|Odor molecules|Chemical reactions
+generate|Chemical reactions|Signals
+sent_to|Signals|Brain
+processes|Brain|Signals
+interprets_as|Brain|Particular smell
+
+Evaluator Feedback:
+{
+  "completeness": "partial",
+  "correctness": "correct",
+  "duplication": "less than 10%",
+  "overall": 0.88,
+  "confidence": 0.85,
+  "feedback": "Most key entities and relations are captured (odor molecules → receptors → chemical reactions → signals → brain → perception). Missing minor details: olfactory epithelium described as a thin layer at the back of the nasal cavity and receptors being 'specialized' could be represented; the causal link could be more explicitly tied to binding (binding→reactions). Slight redundancy in two entry edges (nostrils → nasal cavity) but not problematic."
+}

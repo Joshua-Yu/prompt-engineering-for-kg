@@ -1,0 +1,69 @@
+Method: role
+Evaluator Model: gpt-5-mini
+
+Prompt:
+You are a senior ontologist specializing in biological knowledge graphs for Question Answering (KGQA) and Graph Retrieval-Augmented Generation (Graph RAG).
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Use concise but informative labels for each node (e.g., organism, stage, plant_part, behavior, location).
+Use relation names that are suitable for real-world KG schemas (e.g., hatches_into, transforms_into, feeds_on, lays_on, located_in).
+
+Output only in the following format:
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+odor molecule|molecule
+specific odor molecule|molecule
+nostrils|anatomical_opening
+nasal cavity|anatomical_space
+olfactory epithelium|tissue
+olfactory receptor|receptor
+series of chemical reactions|biochemical_process
+neural signal|signal
+brain|organ
+smell perception|perception
+odor discrimination|perceptual_ability
+
+edges:
+enters_through|odor molecule|nostrils
+enters_into|odor molecule|nasal cavity
+leads_into|nostrils|nasal cavity
+located_in|olfactory epithelium|nasal cavity
+located_in|olfactory receptor|olfactory epithelium
+binds_to|odor molecule|olfactory receptor
+sensitive_to|olfactory receptor|specific odor molecule
+binding_triggers|olfactory receptor|series of chemical reactions
+produces|series of chemical reactions|neural signal
+sends_to|neural signal|brain
+processes|brain|neural signal
+interpreted_as|brain|smell perception
+enables|olfactory receptor|odor discrimination
+distinguishes_between|odor discrimination|specific odor molecule
+
+Evaluator Feedback:
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 10%",
+  "overall": 0.80,
+  "confidence": 0.86,
+  "feedback": "Extraction covers the main entities and most relations (odor molecules → nostrils → nasal cavity → epithelium → receptors → chemical signals → brain → perception). Issues: a redundant node ('specific odor molecule' vs 'odor molecule'); missing an explicit relation showing odor molecules reach the olfactory epithelium (they only enter the nasal cavity); one relation is slightly awkwardly modeled (binding_triggers attributes the trigger to the receptor rather than the binding event or odor molecule). Otherwise the facts are faithfully represented."
+}

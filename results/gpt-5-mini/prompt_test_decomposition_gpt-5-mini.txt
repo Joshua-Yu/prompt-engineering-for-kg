@@ -1,0 +1,80 @@
+Method: decomposition
+Evaluator Model: gpt-5-mini
+
+Prompt:
+We will conceptually decompose the task into steps, but you will only output the final nodes and edges.
+
+Generate a knowledge graph as complete as possible for the text below. The output should be a list of unique nodes and edges suitable for knowledge graph construction in KGQA and Graph RAG. Nodes typically represent entities (stages, organisms, objects, concepts) and edges represent relations (transformations, interactions, attributes, locations).
+
+Decomposition steps (for your internal reasoning):
+- Step 1: Identify all candidate entities (stages, organisms, objects, concepts).
+- Step 2: Identify all semantic relations (transformations, interactions, attributes, locations).
+- Step 3: Deduplicate entities and construct nodes.
+- Step 4: Construct edges using exact node names.
+
+Do NOT print the steps. Only print the final lists.
+
+Output format:
+nodes:
+name|label
+...
+
+edges:
+relation|from node|to node
+...
+
+Use the exact node names from the nodes list when specifying relationships.
+Fields are separated by '|'.
+No explanation, no comments, no code fences: just the 'nodes:' section and the 'edges:' section in plain text.
+
+Text:
+"""How Smell Works:
+Smell begins when odor molecules enter the nasal cavity through the nostrils. These molecules then bind to specialized olfactory receptors located in the olfactory epithelium, a thin layer of tissue at the back of the nasal cavity. Each receptor is sensitive to specific odor molecules, allowing us to distinguish between different smells. When an odor molecule binds to a receptor, it triggers a series of chemical reactions that send signals to the brain, where they are processed and interpreted as a particular smell."""
+
+LLM Output:
+nodes:
+Smell|concept
+Odor molecules|molecule
+Specific odor molecules|molecule
+Nasal cavity|anatomical_structure
+Nostrils|anatomical_structure
+Olfactory receptors|cellular_receptor
+Olfactory epithelium|tissue
+Thin layer of tissue|anatomical_description
+Back of the nasal cavity|anatomical_location
+Binding of odor molecules to receptors|process
+Chemical reactions|process
+Signals|signal
+Brain|organ
+Particular smell|percept
+Distinguish between different smells|function
+
+edges:
+enter|Odor molecules|Nasal cavity
+enter through|Odor molecules|Nostrils
+located in|Olfactory receptors|Olfactory epithelium
+is a|Olfactory epithelium|Thin layer of tissue
+located at|Olfactory epithelium|Back of the nasal cavity
+sensitive to|Olfactory receptors|Specific odor molecules
+subset_of|Specific odor molecules|Odor molecules
+allows|Olfactory receptors|Distinguish between different smells
+bind to|Odor molecules|Olfactory receptors
+caused by|Binding of odor molecules to receptors|Odor molecules
+occurs at|Binding of odor molecules to receptors|Olfactory receptors
+triggers|Binding of odor molecules to receptors|Chemical reactions
+generate|Chemical reactions|Signals
+transmit to|Signals|Brain
+processed in|Signals|Brain
+processes|Brain|Signals
+interpreted as|Signals|Particular smell
+initiated by|Smell|Binding of odor molecules to receptors
+
+Evaluator Feedback:
+{
+  "completeness": "partial",
+  "correctness": "mixed",
+  "duplication": "less than 10%",
+  "overall": 0.70,
+  "confidence": 0.80,
+  "feedback": "Most key entities and processes are present (odor molecules, nostrils, nasal cavity, olfactory receptors, epithelium, binding, chemical reactions, signals, brain, perception). Issues: the interpretation step is attributed to Signals rather than to the Brain (the passage says the brain processes and interprets the signals), so that relation is misplaced. There is a small duplication/over-granularity with 'Olfactory epithelium' and 'Thin layer of tissue', and mirrored edges ('processed in' and 'processes') are redundant. A few relations are awkwardly labeled (e.g., 'caused by' for binding) and you could add an attribute/edge indicating receptors are 'specialized'. Overall faithful but has some incorrect/misplaced relations and minor redundancies."
+}
