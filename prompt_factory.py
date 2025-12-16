@@ -642,9 +642,35 @@ def _ensure_openai_client() -> Any:
         raise RuntimeError(
             "openai package is not installed. Please install it to run LLM tests."
         )
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise RuntimeError("OPENAI_API_KEY is not set.")
-    _OPENAI_CLIENT = OpenAI()
+    api_key = os.environ.get("PROMPT_FACTORY_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "OPENAI_API_KEY (or PROMPT_FACTORY_API_KEY) is not set. "
+            "Provide an API key for the target OpenAI-compatible endpoint."
+        )
+    base_url = (
+        os.environ.get("PROMPT_FACTORY_API_BASE")
+        or os.environ.get("OPENAI_BASE_URL")
+        or os.environ.get("OPENAI_API_BASE")
+    )
+    organization = os.environ.get("PROMPT_FACTORY_ORGANIZATION") or os.environ.get(
+        "OPENAI_ORGANIZATION"
+    )
+    client_kwargs: Dict[str, Any] = {"api_key": api_key}
+    if base_url:
+        client_kwargs["base_url"] = base_url.rstrip("/")
+    if organization:
+        client_kwargs["organization"] = organization
+    extra_headers = os.environ.get("PROMPT_FACTORY_API_HEADERS")
+    if extra_headers:
+        try:
+            client_kwargs["default_headers"] = json.loads(extra_headers)
+        except json.JSONDecodeError as exc:  # pragma: no cover
+            raise RuntimeError(
+                "PROMPT_FACTORY_API_HEADERS must be a valid JSON object string."
+            ) from exc
+
+    _OPENAI_CLIENT = OpenAI(**client_kwargs)
     return _OPENAI_CLIENT
 
 
